@@ -1,18 +1,18 @@
 'use strict';
 
-var ADVERTNUMBER = 8;
-var ADVERTTITLES = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
-var ADVERTOFFERTYPES = ['palace', 'flat', 'house', 'bungalo'];
-var ADVERTOFFERTYPESTRANSLATE = {palace: 'Дворец', flat: 'Квартира', house: 'Дом', bungalo: 'Бунгало'};
-var ADVERTOFFERTIMES = ['12:00', '13:00', '14:00'];
-var ADVERTOFFERFEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
-var ADVERTOFFERPHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
-var PINWIDTH = 50;
-var PINHEIGHT = 70;
-var MAPMINWIDTH = 30;
-var MAPMAXWIDTH = 1170;
-var MAPMINHEIGHT = 130;
-var MAPMAXHEIGHT = 630;
+var ADVERT_NUMBER = 8;
+var ADVERT_TITLES = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
+var ADVERT_OFFER_TYPES = ['palace', 'flat', 'house', 'bungalo'];
+var ADVERT_OFFER_TYPES_TRANSLATE = {palace: 'Дворец', flat: 'Квартира', house: 'Дом', bungalo: 'Бунгало'};
+var ADVERT_OFFER_TIMES = ['12:00', '13:00', '14:00'];
+var ADVERT_OFFER_FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
+var ADVERT_OFFER_PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
+var PIN_WIDTH = 50;
+var PIN_HEIGHT = 70;
+var MAP_MIN_WIDTH = 30;
+var MAP_MAX_WIDTH = 1170;
+var MAP_MIN_HEIGHT = 130;
+var MAP_MAX_HEIGHT = 630;
 
 var getRandomInt = function (max, min) {
   if (!min) {
@@ -77,24 +77,25 @@ var generatePhotos = function (photos) {
   return offerPhotos;
 };
 
-var avatars = generateAvatars(ADVERTNUMBER);
-var titles = generateTitles(ADVERTNUMBER, ADVERTTITLES);
+var avatars = generateAvatars(ADVERT_NUMBER);
+var titles = generateTitles(ADVERT_NUMBER, ADVERT_TITLES);
 
 var generateAdvert = function (counter, types, times, features, photos) {
   var author = {avatar: avatars[counter]};
-  var offer = {};
-  offer.title = titles[counter];
-  offer.price = getRandomInt(1000000, 1000);
-  offer.type = types[getRandomInt(types.length - 1)];
-  offer.rooms = getRandomInt(5, 1);
-  offer.guests = getRandomInt(10, 1);
-  offer.checkin = times[getRandomInt(times.length - 1)];
-  offer.checkout = times[getRandomInt(times.length - 1)];
-  offer.features = generateFeatures(features);
-  offer.description = '';
-  offer.photos = generatePhotos(photos);
-  var location = {x: getRandomInt(MAPMAXWIDTH, MAPMINWIDTH), y: getRandomInt(MAPMAXHEIGHT, MAPMINHEIGHT)};
-  offer.address = location.x + ', ' + location.y;
+  var location = {x: getRandomInt(MAP_MAX_WIDTH, MAP_MIN_WIDTH), y: getRandomInt(MAP_MAX_HEIGHT, MAP_MIN_HEIGHT)};
+  var offer = {
+    title: titles[counter],
+    price: getRandomInt(1000000, 1000),
+    type: types[getRandomInt(types.length - 1)],
+    rooms: getRandomInt(5, 1),
+    guests: getRandomInt(10, 1),
+    checkin: times[getRandomInt(times.length - 1)],
+    checkout: times[getRandomInt(times.length - 1)],
+    features: generateFeatures(features),
+    description: '',
+    photos: generatePhotos(photos),
+    address: location.x + ', ' + location.y
+  };
   var advert = {author: author, offer: offer, location: location};
   return advert;
 };
@@ -102,20 +103,20 @@ var generateAdvert = function (counter, types, times, features, photos) {
 var generateRandomAdverts = function (quantity) {
   var adverts = [];
   for (var i = 0; i < quantity; i++) {
-    var advert = generateAdvert(i, ADVERTOFFERTYPES, ADVERTOFFERTIMES, ADVERTOFFERFEATURES, ADVERTOFFERPHOTOS);
+    var advert = generateAdvert(i, ADVERT_OFFER_TYPES, ADVERT_OFFER_TIMES, ADVERT_OFFER_FEATURES, ADVERT_OFFER_PHOTOS);
     adverts.push(advert);
   }
   return adverts;
 };
 
-var adverts = generateRandomAdverts(ADVERTNUMBER);
+var adverts = generateRandomAdverts(ADVERT_NUMBER);
 var pinOnMap = document.querySelector('.map__pins');
 var pinTemplate = document.querySelector('#pin').content;
 var pinsList = document.createDocumentFragment();
 
 var createPin = function (counter) {
   var pinElement = pinTemplate.cloneNode(true);
-  var pinLocation = {x: adverts[counter].location.x - PINWIDTH / 2, y: adverts[counter].location.y - PINHEIGHT};
+  var pinLocation = {x: adverts[counter].location.x - PIN_WIDTH / 2, y: adverts[counter].location.y - PIN_HEIGHT};
   var advertLocation = 'left: ' + pinLocation.x + 'px; top: ' + pinLocation.y + 'px;';
   pinElement.querySelector('.map__pin').style = advertLocation;
   pinElement.querySelector('img').src = adverts[counter].author.avatar;
@@ -131,7 +132,7 @@ var createPinsList = function (quantity) {
 };
 
 var renderPins = function () {
-  pinsList = createPinsList(ADVERTNUMBER);
+  pinsList = createPinsList(ADVERT_NUMBER);
   pinOnMap.appendChild(pinsList);
 };
 
@@ -148,7 +149,7 @@ var createAdvert = function (counter) {
   advertElement.querySelector('.popup__title').textContent = adverts[counter].offer.title;
   advertElement.querySelector('.popup__text--address').textContent = adverts[counter].offer.address;
   advertElement.querySelector('.popup__text--price').textContent = adverts[counter].offer.price + '$' + ' /ночь';
-  advertElement.querySelector('.popup__type').textContent = ADVERTOFFERTYPESTRANSLATE[adverts[counter].offer.type];
+  advertElement.querySelector('.popup__type').textContent = ADVERT_OFFER_TYPES_TRANSLATE[adverts[counter].offer.type];
   advertElement.querySelector('.popup__text--capacity').textContent = adverts[counter].offer.rooms + ' комнаты для ' + adverts[counter].offer.guests + ' гостей';
   advertElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + adverts[counter].offer.checkin + ', выезд до ' + adverts[counter].offer.checkout + '.';
   advertElement.querySelector('.popup__description').textContent = adverts[counter].offer.description;
@@ -173,7 +174,7 @@ var createAdvert = function (counter) {
     advertElement.querySelector('.popup__features').appendChild(featureIcon);
   }
 
-  advertWindow.insertBefore(advertElement, document.querySelector('.map').querySelector('.map__filters-container'));
+  advertWindow.insertBefore(advertElement, document.querySelector('.map.map__filters-container'));
 };
 
 createAdvert(0);
