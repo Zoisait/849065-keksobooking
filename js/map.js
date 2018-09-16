@@ -136,8 +136,12 @@ var renderPins = function () {
   pinOnMap.appendChild(pinsList);
 };
 
-var mapSection = document.querySelector('.map');
-mapSection.classList.remove('map--faded');
+// var mapSection = document.querySelector('.map');
+// mapSection.classList.remove('map--faded');
+var formFields = document.querySelectorAll('fieldset');
+for (var i = 0; i < formFields.length; i++) {
+  formFields[i].setAttribute('disabled', 'disabled');
+}
 
 renderPins();
 
@@ -156,7 +160,7 @@ var createAdvert = function (counter) {
   advertElement.querySelector('.popup__avatar').src = adverts[counter].author.avatar;
   advertElement.querySelector('.popup__photo:nth-child(1)').src = adverts[counter].offer.photos[0];
 
-  for (var i = 1; i < adverts[counter].offer.photos.length; i++) {
+  for (i = 1; i < adverts[counter].offer.photos.length; i++) {
     var additionalPhoto = document.createElement('img');
     additionalPhoto.classList.add('popup__photo');
     additionalPhoto.src = adverts[counter].offer.photos[i];
