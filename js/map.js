@@ -8,9 +8,10 @@ var ADVERT_OFFER_TIMES = ['12:00', '13:00', '14:00'];
 var ADVERT_OFFER_FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 var ADVERT_OFFER_PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
 var PIN_WIDTH = 50;
-var PIN_HEIGHT = 70;
-var MAP_MIN_WIDTH = 30;
-var MAP_MAX_WIDTH = 1170;
+var PIN_HEIGHT = 75;
+var MAIN_PIN_POINTER = 22;
+var MAP_MIN_WIDTH = 0;
+var MAP_MAX_WIDTH = 1200;
 var MAP_MIN_HEIGHT = 130;
 var MAP_MAX_HEIGHT = 630;
 
@@ -136,15 +137,6 @@ var renderPins = function () {
   pinOnMap.appendChild(pinsList);
 };
 
-// var mapSection = document.querySelector('.map');
-// mapSection.classList.remove('map--faded');
-var formFields = document.querySelectorAll('fieldset');
-for (var i = 0; i < formFields.length; i++) {
-  formFields[i].setAttribute('disabled', 'disabled');
-}
-
-renderPins();
-
 var advertTemplate = document.querySelector('#card').content;
 var advertWindow = document.querySelector('.map');
 
@@ -181,4 +173,114 @@ var createAdvert = function (counter) {
   advertWindow.insertBefore(advertElement, document.querySelector('.map.map__filters-container'));
 };
 
-createAdvert(0);
+var formFields = document.querySelectorAll('fieldset');
+for (var i = 0; i < formFields.length; i++) {
+  formFields[i].setAttribute('disabled', 'disabled');
+}
+var mapActivated = false;
+
+var activateMap = function () {
+  var mapSection = document.querySelector('.map');
+  mapSection.classList.remove('map--faded');
+  var advertSection = document.querySelector('.ad-form');
+  advertSection.classList.remove('ad-form--disabled');
+  for (i = 0; i < formFields.length; i++) {
+    formFields[i].removeAttribute('disabled');
+  }
+  mapActivated = true;
+  renderPins();
+};
+
+var fillAddress = function () {
+  var addressField = document.querySelector('#address');
+  var addressX = Math.round(mapPin.offsetLeft + mapPin.offsetWidth / 2);
+  var addressY = Math.round(mapPin.offsetTop + mapPin.offsetHeight + MAIN_PIN_POINTER);
+  addressField.value = addressX + ', ' + addressY;
+};
+
+var mapPin = document.querySelector('.map__pin--main');
+
+mapPin.addEventListener('mouseup', function () {
+  if (!mapActivated) {
+    activateMap();
+  }
+  fillAddress();
+  createAdvert(0);
+  document.querySelector('article').classList.add('hidden');
+  advertCardHandler();
+});
+
+var advertCardHandler = function () {
+  var advertsOpen = document.querySelectorAll('.map__pin');
+  var advertClose = document.querySelector('.popup__close');
+  var advertCard = document.querySelector('article');
+  var ESC_KEYCODE = 27;
+  var ENTER_KEYCODE = 13;
+
+  var advertCloseHandler = function (evt) {
+    if (evt.keyCode === ESC_KEYCODE) {
+      closePopup();
+    }
+  };
+
+  var openPopup = function (counter) {
+    advertWindow.removeChild(advertCard);
+    createAdvert(counter);
+    document.addEventListener('keydown', advertCloseHandler);
+  };
+
+  var closePopup = function () {
+    advertCard.classList.add('hidden');
+    document.removeEventListener('keydown', advertCloseHandler);
+  };
+
+
+  advertsOpen[1].addEventListener('click', function () {
+    openPopup(0);
+  });
+
+  advertsOpen[2].addEventListener('click', function () {
+    openPopup(1);
+  });
+
+  advertsOpen[3].addEventListener('click', function () {
+    openPopup(2);
+  });
+
+  advertsOpen[4].addEventListener('click', function () {
+    openPopup(3);
+  });
+
+  advertsOpen[5].addEventListener('click', function () {
+    openPopup(4);
+  });
+
+  advertsOpen[6].addEventListener('click', function () {
+    openPopup(5);
+  });
+
+  advertsOpen[7].addEventListener('click', function () {
+    openPopup(6);
+  });
+
+  advertsOpen[8].addEventListener('click', function () {
+    openPopup(7);
+  });
+
+
+  advertsOpen[0].addEventListener('keydown', function (evt) {
+    if (evt.keyCode === ENTER_KEYCODE) {
+      openPopup(0);
+    }
+  });
+
+  advertClose.addEventListener('click', function () {
+    closePopup();
+  });
+
+  advertClose.addEventListener('keydown', function (evt) {
+    if (evt.keyCode === ENTER_KEYCODE) {
+      closePopup();
+    }
+  });
+};
