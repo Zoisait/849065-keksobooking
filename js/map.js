@@ -203,11 +203,11 @@ var mapPin = document.querySelector('.map__pin--main');
 mapPin.addEventListener('mouseup', function () {
   if (!mapActivated) {
     activateMap();
+    createAdvert(0);
+    document.querySelector('article').classList.add('hidden');
+    advertCardHandler();
   }
   fillAddress();
-  createAdvert(0);
-  document.querySelector('article').classList.add('hidden');
-  advertCardHandler();
 });
 
 var advertCardHandler = function () {
@@ -215,7 +215,6 @@ var advertCardHandler = function () {
   var advertClose = document.querySelector('.popup__close');
   var advertCard = document.querySelector('article');
   var ESC_KEYCODE = 27;
-  var ENTER_KEYCODE = 13;
 
   var advertCloseHandler = function (evt) {
     if (evt.keyCode === ESC_KEYCODE) {
@@ -224,16 +223,21 @@ var advertCardHandler = function () {
   };
 
   var openPopup = function (counter) {
+    advertCard = document.querySelector('article');
     advertWindow.removeChild(advertCard);
     createAdvert(counter);
     document.addEventListener('keydown', advertCloseHandler);
+    advertClose = document.querySelector('.popup__close');
+    advertClose.addEventListener('click', function () {
+      closePopup();
+    });
   };
 
   var closePopup = function () {
+    advertCard = document.querySelector('article');
     advertCard.classList.add('hidden');
     document.removeEventListener('keydown', advertCloseHandler);
   };
-
 
   advertsOpen[1].addEventListener('click', function () {
     openPopup(0);
@@ -265,22 +269,5 @@ var advertCardHandler = function () {
 
   advertsOpen[8].addEventListener('click', function () {
     openPopup(7);
-  });
-
-
-  advertsOpen[0].addEventListener('keydown', function (evt) {
-    if (evt.keyCode === ENTER_KEYCODE) {
-      openPopup(0);
-    }
-  });
-
-  advertClose.addEventListener('click', function () {
-    closePopup();
-  });
-
-  advertClose.addEventListener('keydown', function (evt) {
-    if (evt.keyCode === ENTER_KEYCODE) {
-      closePopup();
-    }
   });
 };
