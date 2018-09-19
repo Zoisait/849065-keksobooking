@@ -14,6 +14,7 @@ var MAP_MIN_WIDTH = 0;
 var MAP_MAX_WIDTH = 1200;
 var MAP_MIN_HEIGHT = 130;
 var MAP_MAX_HEIGHT = 630;
+var ESC_KEYCODE = 27;
 
 var getRandomInt = function (max, min) {
   if (!min) {
@@ -211,10 +212,9 @@ mapPin.addEventListener('mouseup', function () {
 });
 
 var advertCardHandler = function () {
-  var advertsOpen = document.querySelectorAll('.map__pin');
+  var advertsOpen = document.querySelectorAll('.map__pin:not(.map__pin--main)');
   var advertClose = document.querySelector('.popup__close');
   var advertCard = document.querySelector('article');
-  var ESC_KEYCODE = 27;
 
   var advertCloseHandler = function (evt) {
     if (evt.keyCode === ESC_KEYCODE) {
@@ -239,35 +239,7 @@ var advertCardHandler = function () {
     document.removeEventListener('keydown', advertCloseHandler);
   };
 
-  advertsOpen[1].addEventListener('click', function () {
-    openPopup(0);
-  });
-
-  advertsOpen[2].addEventListener('click', function () {
-    openPopup(1);
-  });
-
-  advertsOpen[3].addEventListener('click', function () {
-    openPopup(2);
-  });
-
-  advertsOpen[4].addEventListener('click', function () {
-    openPopup(3);
-  });
-
-  advertsOpen[5].addEventListener('click', function () {
-    openPopup(4);
-  });
-
-  advertsOpen[6].addEventListener('click', function () {
-    openPopup(5);
-  });
-
-  advertsOpen[7].addEventListener('click', function () {
-    openPopup(6);
-  });
-
-  advertsOpen[8].addEventListener('click', function () {
-    openPopup(7);
-  });
+  for (i = 0; i < advertsOpen.length; i++) {
+    advertsOpen[i].addEventListener('click', openPopup.bind(null, i));
+  }
 };
