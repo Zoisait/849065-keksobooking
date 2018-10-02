@@ -10,10 +10,12 @@ var ADVERT_OFFER_PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg',
 var PIN_WIDTH = 50;
 var PIN_HEIGHT = 75;
 var MAIN_PIN_POINTER = 22;
-var MAP_MIN_WIDTH = 0;
+var MAIN_PIN_STARTING_HEIGHT = 375;
+var MAIN_PIN_STARTING_WIDTH = 570;
+var MAP_MIN_WIDTH = 1;
 var MAP_MAX_WIDTH = 1200;
-var MAP_MIN_HEIGHT = 130;
-var MAP_MAX_HEIGHT = 630;
+var MAP_MIN_HEIGHT = 150; // в ТЗ указано 130, но точка с координатами 130 за горизонтом
+var MAP_MAX_HEIGHT = 700; // в ТЗ указано 630, но точка с координатами 630 существенно выше меню фильтра
 var ESC_KEYCODE = 27;
 
 var getRandomInt = function (max, min) {
@@ -192,24 +194,14 @@ var activateMap = function () {
   renderPins();
 };
 
+var mapPin = document.querySelector('.map__pin--main');
+
 var fillAddress = function () {
   var addressField = document.querySelector('#address');
-  var addressX = Math.round(mapPin.offsetLeft + mapPin.offsetWidth / 2);
+  var addressX = Math.floor(mapPin.offsetLeft + mapPin.offsetWidth / 2);
   var addressY = Math.round(mapPin.offsetTop + mapPin.offsetHeight + MAIN_PIN_POINTER);
   addressField.value = addressX + ', ' + addressY;
 };
-
-var mapPin = document.querySelector('.map__pin--main');
-
-mapPin.addEventListener('mouseup', function () {
-  if (!mapActivated) {
-    activateMap();
-    createAdvert(0);
-    document.querySelector('article').classList.add('hidden');
-    advertCardHandler();
-  }
-  fillAddress();
-});
 
 var advertCardHandler = function () {
   var advertsOpen = document.querySelectorAll('.map__pin:not(.map__pin--main)');
@@ -321,7 +313,7 @@ var advertCardHandler = function () {
     }
   });
 
-  var deactivateMap = function () {
+  var deactivateMapHandler = function () {
     var mapSection = document.querySelector('.map');
     mapSection.classList.add('map--faded');
     var advertSection = document.querySelector('.ad-form');
@@ -336,11 +328,62 @@ var advertCardHandler = function () {
     }
     closePopup();
     advertWindow.removeChild(advertCard);
-    return mapActivated;
+    mapPin.style.top = MAIN_PIN_STARTING_HEIGHT + 'px';
+    mapPin.style.left = MAIN_PIN_STARTING_WIDTH + 'px';
+    clearButton.removeEventListener('click', deactivateMapHandler);
   };
 
   var clearButton = document.querySelector('.ad-form__reset');
-  clearButton.addEventListener('click', function () {
-    deactivateMap();
-  });
+  clearButton.addEventListener('click', deactivateMapHandler);
 };
+
+mapPin.addEventListener('mousedown', function (evt) {
+
+  var startCoords = {
+    x: evt.clientX,
+    y: evt.clientY
+  };
+
+  var onMouseMove = function (moveEvt) {
+    var shift = {
+      x: startCoords.x - moveEvt.clientX,
+      y: startCoords.y - moveEvt.clientY
+    };
+
+    startCoords = {
+      x: moveEvt.clientX,
+      y: moveEvt.clientY
+    };
+
+    if ((mapPin.offsetLeft - shift.x) > (MAP_MAX_WIDTH - mapPin.offsetWidth / 2)) {
+      mapPin.style.left = (MAP_MAX_WIDTH - mapPin.offsetWidth / 2) + 'px';
+    } else if ((mapPin.offsetLeft - shift.x) < (MAP_MIN_WIDTH - mapPin.offsetWidth / 2)) {
+      mapPin.style.left = (MAP_MIN_WIDTH - mapPin.offsetWidth / 2) + 'px';
+    } else {
+      mapPin.style.left = (mapPin.offsetLeft - shift.x) + 'px';
+    }
+
+    if ((mapPin.offsetTop - shift.y) > (MAP_MAX_HEIGHT - mapPin.offsetHeight - MAIN_PIN_POINTER)) {
+      mapPin.style.top = (MAP_MAX_HEIGHT - mapPin.offsetHeight - MAIN_PIN_POINTER) + 'px';
+    } else if ((mapPin.offsetTop - shift.y) < (MAP_MIN_HEIGHT - mapPin.offsetHeight - MAIN_PIN_POINTER)) {
+      mapPin.style.top = (MAP_MIN_HEIGHT - mapPin.offsetHeight - MAIN_PIN_POINTER) + 'px';
+    } else {
+      mapPin.style.top = (mapPin.offsetTop - shift.y) + 'px';
+    }
+  };
+
+  var onMouseUp = function () {
+    if (!mapActivated) {
+      activateMap();
+      createAdvert(0);
+      document.querySelector('article').classList.add('hidden');
+      advertCardHandler();
+    }
+    fillAddress();
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
+
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+});
