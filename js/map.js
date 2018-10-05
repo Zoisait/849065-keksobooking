@@ -168,10 +168,59 @@
       mapPinMain.style.top = MAIN_PIN_STARTING_HEIGHT + 'px';
       mapPinMain.style.left = MAIN_PIN_STARTING_WIDTH + 'px';
       clearButton.removeEventListener('click', deactivateMap);
+      form.removeEventListener('submit', submitAdvert);
     };
 
     var clearButton = document.querySelector('.ad-form__reset');
     clearButton.addEventListener('click', deactivateMap);
+
+    var form = document.querySelector('.ad-form');
+    var submitAdvert = function (evt) {
+      window.upload(new FormData(form), successHandler, errorHandler);
+      evt.preventDefault();
+    };
+
+    form.addEventListener('submit', submitAdvert);
+
+    var successHandler = function () {
+      form.reset();
+      deactivateMap();
+      var successTemplate = document.querySelector('#success').content;
+      var successNode = successTemplate.cloneNode(true);
+      document.querySelector('main').appendChild(successNode);
+      mapPinMain.focus();
+
+      var submitConfirmationHandler = function (evt) {
+        if (evt.type === 'click' || evt.keyCode === window.util.ESC_KEYCODE) {
+          var successMessage = document.querySelector('.success');
+          document.querySelector('main').removeChild(successMessage);
+          document.removeEventListener('click', submitConfirmationHandler);
+          document.removeEventListener('keydown', submitConfirmationHandler);
+        }
+      };
+      document.addEventListener('click', submitConfirmationHandler);
+      document.addEventListener('keydown', submitConfirmationHandler);
+    };
+
+    var errorHandler = function () {
+      var errorTemplate = document.querySelector('#error').content;
+      var errorNode = errorTemplate.cloneNode(true);
+      document.querySelector('main').appendChild(errorNode);
+      var errorButton = document.querySelector('.error__button');
+      mapPinMain.focus();
+
+      var submitErrorHandler = function (evt) {
+        if (evt.type === 'click' || evt.keyCode === window.util.ESC_KEYCODE) {
+          var errorMessage = document.querySelector('.error');
+          document.querySelector('main').removeChild(errorMessage);
+          errorButton.removeEventListener('click', submitErrorHandler);
+          document.removeEventListener('keydown', submitErrorHandler);
+        }
+      };
+      errorButton.addEventListener('click', submitErrorHandler);
+      document.addEventListener('keydown', submitErrorHandler);
+    };
+
   };
 
   mapPinMain.addEventListener('mousedown', function (evt) {

@@ -1,7 +1,7 @@
 'use strict';
 (function () {
 
-  var ADVERT_NUMBER = 8;
+  var ADVERT_NUMBER = 10;
   //   var ADVERT_TITLES = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
   //   var ADVERT_OFFER_TYPES = ['palace', 'flat', 'house', 'bungalo'];
   //   var ADVERT_OFFER_TYPES_TRANSLATE = {palace: 'Дворец', flat: 'Квартира', house: 'Дом', bungalo: 'Бунгало'};
